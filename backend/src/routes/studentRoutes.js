@@ -4,7 +4,8 @@ const {
   getReceiptById,
   requestBonafide,
   getBonafideRequests,
-  getBonafideRequestById
+  getBonafideRequestById,
+  getNotices
 } = require("../controllers/studentController");
 const { requireAuth } = require("../middleware/authMiddleware");
 const { requireRole } = require("../middleware/roleMiddleware");
@@ -18,5 +19,6 @@ router.get("/receipts/:id", getReceiptById);
 router.post("/bonafide-requests", requestBonafide);
 router.get("/bonafide-requests", getBonafideRequests);
 router.get("/bonafide-requests/:id", getBonafideRequestById);
+router.get("/notices", getNotices);
 
 module.exports = router;

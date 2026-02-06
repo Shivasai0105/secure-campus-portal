@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Campus Portal</title>
+    <link href="./dist/output.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Notifications -->
+    <div id="notification-area" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Login Section -->
+    <section id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Secure Campus Login</h2>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">Email</label>
+                    <input type="email" id="email" required
+                        class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Password</label>
+                    <input type="password" id="password" required
+                        class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Login</button>
+            </form>
+            <div id="login-error" class="text-red-500 text-sm mt-4 hidden"></div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section (Hidden by default) -->
+    <section id="dashboard-section" class="hidden">
+        <nav class="bg-white shadow">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-bold text-blue-900">Secure Campus Portal</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="user-name" class="text-gray-700 font-medium"></span>
+                        <span id="user-role"
+                            class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full uppercase font-semibold"></span>
+                        <button id="logout-btn" class="text-red-600 hover:text-red-800 font-medium">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Student Views -->
+            <div id="student-view" class="hidden role-view space-y-6">
+                <!-- Notices Section -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-bold mb-4">📢 Notices & Circulars</h3>
+                    <div id="notices-list" class="space-y-3"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Fee Receipts -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Fee Receipts</h3>
+                        <button id="refresh-receipts"
+                            class="mb-4 text-sm text-blue-600 hover:underline">Refresh</button>
+                        <ul id="receipts-list" class="space-y-2 text-sm"></ul>
+                    </div>
+                    <!-- Bonafide Request -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Request Bonafide</h3>
+                        <form id="bonafide-form" class="space-y-4">
+                            <textarea id="bonafide-reason" placeholder="Reason for request..."
+                                class="w-full p-2 border rounded" required></textarea>
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Submit
+                                Request</button>
+                        </form>
+                        <h4 class="font-semibold mt-6 mb-2">History</h4>
+                        <ul id="bonafide-history" class="space-y-2 text-sm"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Faculty Views -->
+            <div id="faculty-view" class="hidden role-view">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-bold mb-4">Pending Bonafide Requests</h3>
+                    <button id="refresh-pending-bonafide"
+                        class="mb-4 text-sm text-blue-600 hover:underline">Refresh</button>
+                    <div id="pending-bonafide-list" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Admin Views -->
+            <div id="admin-view" class="hidden role-view space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Create Notice -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">📢 Upload Notice</h3>
+                        <form id="create-notice-form" class="space-y-3">
+                            <input type="text" id="notice-title" placeholder="Notice Title"
+                                class="w-full p-2 border rounded" required>
+                            <textarea id="notice-body" placeholder="Notice Description"
+                                class="w-full p-2 border rounded h-24" required></textarea>
+                            <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded">Publish
+                                Notice</button>
+                        </form>
+                    </div>
+
+                    <!-- Create User -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Create User</h3>
+                        <form id="create-user-form" class="space-y-3">
+                            <input type="text" id="new-user-name" placeholder="Name" class="w-full p-2 border rounded"
+                                required>
+                            <input type="email" id="new-user-email" placeholder="Email"
+                                class="w-full p-2 border rounded" required>
+                            <input type="password" id="new-user-password" placeholder="Password"
+                                class="w-full p-2 border rounded" required>
+                            <select id="new-user-role" class="w-full p-2 border rounded">
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded">Create
+                                User</button>
+                        </form>
+                    </div>
+                    <tr class="text-left bg-gray-100">
+                        <th class="p-2">Time</th>
+                        <th class="p-2">User</th>
+                        <th class="p-2">Action</th>
+                        <th class="p-2">IP</th>
+                    </tr>
+                    </thead>
+                    <tbody id="audit-logs-list"></tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+            </div>
+        </main>
+    </section>
+
+    <script src="./src/main.js"></script>
+</body>
+
+</html>

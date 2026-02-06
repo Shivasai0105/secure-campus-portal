@@ -108,10 +108,26 @@ const getBonafideRequestById = async (req, res) => {
   }
 };
 
+const getNotices = async (req, res) => {
+  try {
+    const Notice = require("../models/Notice");
+    const notices = await Notice.find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean();
+
+    return res.json({ notices });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getReceipts,
   getReceiptById,
   requestBonafide,
   getBonafideRequests,
-  getBonafideRequestById
+  getBonafideRequestById,
+  getNotices
 };
