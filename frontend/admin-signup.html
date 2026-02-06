@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration</title>
+    <link rel="stylesheet" href="role-signup-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+        }
+
+        /* Red theme for Admin */
+    </style>
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="form-header" style="background: var(--primary-color);">
+            <h2><i class="fas fa-user-shield"></i> Admin Registration</h2>
+            <p>System Administrator Access Setup</p>
+        </div>
+
+        <form id="admin-signup-form" class="form-body">
+            <div class="form-grid">
+                <!-- Personal Info -->
+                <div class="form-group full-width">
+                    <label>Full Name</label>
+                    <input type="text" id="name" required placeholder="Admin Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="text" id="employee-id" required placeholder="e.g. ADM001">
+                </div>
+
+                <div class="form-group">
+                    <label>Admin Level</label>
+                    <select id="admin-level" required>
+                        <option value="">Select Level</option>
+                        <option value="super_admin">Super Admin (IT)</option>
+                        <option value="dept_admin">Department Admin</option>
+                        <option value="registrar">Registrar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Office Location</label>
+                    <input type="text" id="office-location" required placeholder="e.g. Server Room, Block B">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" required placeholder="Work Phone">
+                </div>
+
+                <div class="form-group">
+                    <label>Department (Managed)</label>
+                    <select id="department" required>
+                        <option value="all">All Departments (Central)</option>
+                        <option value="cse">Computer Science</option>
+                        <option value="admin">Administration</option>
+                        <option value="exam">Examination Branch</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Email Address</label>
+                    <input type="email" id="email" required placeholder="admin@college.edu">
+                </div>
+
+                <!-- Password -->
+                <div class="form-group password-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                    <button type="button" class="toggle-password" onclick="togglePass('password')">
+                        <i class="far fa-eye"></i>
+                    </button>
+                    <div class="strength-meter">
+                        <div class="strength-bar" id="strength-bar"></div>
+                    </div>
+                    <div class="error-msg" id="pass-error">High security password required</div>
+                </div>
+
+                <div class="form-group password-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirm-password" required>
+                </div>
+
+                <!-- Terms & Security -->
+                <div class="form-group full-width">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">I agree to the Terms of Service</label>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="security-ack" required>
+                        <label for="security-ack" style="color: #d32f2f; font-weight: bold;">I acknowledge that my
+                            actions will be audit-logged.</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit full-width" style="background: var(--primary-color);">Register
+                    Securely</button>
+            </div>
+            <p style="text-align: center; margin-top: 1rem; color: #666;">
+                Already registered? <a href="login.html" style="color: var(--primary-color);">Login here</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="role-signup-script.js"></script>
+    <script>
+        window.CURRENT_ROLE = 'admin';
+    </script>
+</body>
+
+</html>

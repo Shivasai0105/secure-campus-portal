@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Campus Portal - Registration</title>
+    <link rel="stylesheet" href="registration-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <h1>Secure Campus Portal</h1>
+        <p class="subtitle">Select your role to get started with our secure academic platform.</p>
+    </header>
+
+    <div class="container">
+        <div class="cards-wrapper">
+            <!-- Student Card -->
+            <div class="role-card" onclick="location.href='student-signup.html'">
+                <div class="card-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h2>Student</h2>
+                <ul class="features-list">
+                    <li>Access Bonafide Certificates</li>
+                    <li>View Fee Receipts</li>
+                    <li>Read Important Notices</li>
+                    <li>Manage Academic Profile</li>
+                </ul>
+                <button class="btn">Register as Student</button>
+            </div>
+
+            <!-- Faculty Card -->
+            <div class="role-card" onclick="location.href='faculty-signup.html'">
+                <div class="card-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h2>Faculty</h2>
+                <ul class="features-list">
+                    <li>Post Announcements</li>
+                    <li>Manage Circulars</li>
+                    <li>View Applications</li>
+                    <li>Academic Coordination</li>
+                </ul>
+                <button class="btn">Register as Faculty</button>
+            </div>
+
+            <!-- Admin Card -->
+            <div class="role-card" onclick="location.href='admin-signup.html'">
+                <div class="card-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2>Admin</h2>
+                <ul class="features-list">
+                    <li>Manage Users & Roles</li>
+                    <li>View Audit Logs</li>
+                    <li>System Settings</li>
+                    <li>Security Monitoring</li>
+                </ul>
+                <button class="btn">Register as Admin</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <p>Already have an account? <a href="login.html"
+                    style="color: var(--primary-color); font-weight: bold;">Login here</a></p>
+        </div>
+    </div>
+
+    <script src="registration-script.js"></script>
+</body>
+
+</html>

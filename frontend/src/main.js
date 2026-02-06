@@ -3,10 +3,10 @@ let csrfToken = null;
 let currentUser = null;
 
 // --- DOM Elements ---
-const loginSection = document.getElementById("login-section");
+// loginSection removed
 const dashboardSection = document.getElementById("dashboard-section");
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
+// loginForm removed
+// loginError removed
 const logoutBtn = document.getElementById("logout-btn");
 
 // --- Utility Functions ---
@@ -67,7 +67,6 @@ function showSection(sectionId) {
 
 function updateUI(user) {
     if (user) {
-        loginSection.classList.add("hidden");
         dashboardSection.classList.remove("hidden");
         document.getElementById("user-name").textContent = user.name;
         document.getElementById("user-role").textContent = user.role;
@@ -85,10 +84,11 @@ function updateUI(user) {
             loadAdminData();
         }
     } else {
-        loginSection.classList.remove("hidden");
-        dashboardSection.classList.add("hidden");
+        window.location.href = 'login.html';
     }
 }
+
+// --- Auth Flow ---
 
 // --- Auth Flow ---
 
@@ -101,42 +101,21 @@ async function checkSession() {
             currentUser = data.user;
             updateUI(currentUser);
         } else {
-            updateUI(null);
+            // Redirect to login page if no session
+            window.location.href = 'login.html';
         }
     } catch (err) {
         console.error(err);
-        updateUI(null);
+        window.location.href = 'login.html';
     }
 }
 
-loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    loginError.classList.add("hidden");
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    try {
-        const res = await apiCall("/auth/login", "POST", { email, password });
-        const data = await res.json();
-
-        if (res.ok) {
-            currentUser = data.user;
-            await fetchCsrfToken(); // Refresh token after login
-            updateUI(currentUser);
-        } else {
-            loginError.textContent = data.message || "Login failed";
-            loginError.classList.remove("hidden");
-        }
-    } catch (err) {
-        loginError.textContent = "Network error";
-        loginError.classList.remove("hidden");
-    }
-});
+// Login form logic moved to login.html/login-script.js
 
 logoutBtn.addEventListener("click", async () => {
     await apiCall("/auth/logout", "POST");
     currentUser = null;
-    window.location.reload();
+    window.location.href = 'login.html';
 });
 
 // --- Role Specific Logic (Simplified for MVP) ---
@@ -272,6 +251,7 @@ document.getElementById("create-user-form")?.addEventListener("submit", async (e
     }
 });
 
+// Admin Notices
 document.getElementById("create-notice-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const title = document.getElementById("notice-title").value;
@@ -281,6 +261,24 @@ document.getElementById("create-notice-form")?.addEventListener("submit", async 
     if (res.ok) {
         alert("Notice published successfully!");
         document.getElementById("create-notice-form").reset();
+    } else {
+        const data = await res.json();
+        alert("Error: " + data.message);
+    }
+});
+
+// Faculty Notices
+document.getElementById("faculty-create-notice-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const title = document.getElementById("fac-notice-title").value;
+    const body = document.getElementById("fac-notice-body").value;
+
+    // Reusing the same endpoint, assuming backend permissions check role
+    // Note: In a real app, might be a different endpoint or handled by permissions
+    const res = await apiCall("/admin/notices", "POST", { title, body });
+    if (res.ok) {
+        alert("Announcement posted successfully!");
+        document.getElementById("faculty-create-notice-form").reset();
     } else {
         const data = await res.json();
         alert("Error: " + data.message);

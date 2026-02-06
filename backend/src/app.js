@@ -73,18 +73,33 @@ app.use(
 /* ---------- CSRF PROTECTION ---------- */
 // Enable CSRF mechanism
 // NOTE: Must be used AFTER session middleware
-app.use(csurf({
-  value: (req) => {
-    // Check multiple sources for CSRF token
-    return req.headers['_csrf'] ||
-      req.body._csrf ||
-      req.query._csrf ||
-      req.headers['csrf-token'] ||
-      req.headers['xsrf-token'] ||
-      req.headers['x-csrf-token'] ||
-      req.headers['x-xsrf-token'];
+// Skip CSRF for public auth endpoints (registration, login)
+app.use((req, res, next) => {
+  const publicPaths = [
+    '/api/auth/register-student',
+    '/api/auth/register-faculty',
+    '/api/auth/register-admin',
+    '/api/auth/login'
+  ];
+
+  if (publicPaths.includes(req.path)) {
+    return next();
   }
-}));
+
+  // Apply CSRF protection for all other routes
+  csurf({
+    value: (req) => {
+      // Check multiple sources for CSRF token
+      return req.headers['_csrf'] ||
+        req.body._csrf ||
+        req.query._csrf ||
+        req.headers['csrf-token'] ||
+        req.headers['xsrf-token'] ||
+        req.headers['x-csrf-token'] ||
+        req.headers['x-xsrf-token'];
+    }
+  })(req, res, next);
+});
 
 // CSRF Token Endpoint
 app.get("/api/csrf-token", (req, res) => {

@@ -13,26 +13,7 @@
     <div id="notification-area" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <!-- Login Section -->
-    <section id="login-section" class="flex items-center justify-center min-h-screen">
-        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Secure Campus Login</h2>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700">Email</label>
-                    <input type="email" id="email" required
-                        class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Password</label>
-                    <input type="password" id="password" required
-                        class="w-full mt-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <button type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Login</button>
-            </form>
-            <div id="login-error" class="text-red-500 text-sm mt-4 hidden"></div>
-        </div>
-    </section>
+    <!-- Login Section Removed - Redirects to login.html -->
 
     <!-- Dashboard Section (Hidden by default) -->
     <section id="dashboard-section" class="hidden">
@@ -86,11 +67,26 @@
 
             <!-- Faculty Views -->
             <div id="faculty-view" class="hidden role-view">
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold mb-4">Pending Bonafide Requests</h3>
-                    <button id="refresh-pending-bonafide"
-                        class="mb-4 text-sm text-blue-600 hover:underline">Refresh</button>
-                    <div id="pending-bonafide-list" class="space-y-4"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">Pending Bonafide Requests</h3>
+                        <button id="refresh-pending-bonafide"
+                            class="mb-4 text-sm text-blue-600 hover:underline">Refresh</button>
+                        <div id="pending-bonafide-list" class="space-y-4"></div>
+                    </div>
+
+                    <!-- Faculty Post Notice -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-4">📢 Post Announcement</h3>
+                        <form id="faculty-create-notice-form" class="space-y-3">
+                            <input type="text" id="fac-notice-title" placeholder="Announcement Title"
+                                class="w-full p-2 border rounded" required>
+                            <textarea id="fac-notice-body" placeholder="Details..."
+                                class="w-full p-2 border rounded h-24" required></textarea>
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded">Post
+                                Announcement</button>
+                        </form>
+                    </div>
                 </div>
             </div>
 

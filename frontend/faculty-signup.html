@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Registration</title>
+    <link rel="stylesheet" href="role-signup-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+        }
+
+        /* Green theme for Faculty */
+    </style>
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="form-header" style="background: var(--primary-color);">
+            <h2><i class="fas fa-chalkboard-teacher"></i> Faculty Registration</h2>
+            <p>Join as a faculty member</p>
+        </div>
+
+        <form id="faculty-signup-form" class="form-body">
+            <div class="form-grid">
+                <!-- Personal Info -->
+                <div class="form-group full-width">
+                    <label>Full Name</label>
+                    <input type="text" id="name" required placeholder="Dr. / Prof. Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="text" id="employee-id" required pattern="[A-Za-z0-9]{4,}" placeholder="e.g. FAC202301">
+                    <div class="error-msg">Min 4 chars alphanumeric</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Designation</label>
+                    <select id="designation" required>
+                        <option value="">Select Designation</option>
+                        <option value="professor">Professor</option>
+                        <option value="assoc_prof">Associate Professor</option>
+                        <option value="asst_prof">Assistant Professor</option>
+                        <option value="lecturer">Lecturer</option>
+                        <option value="hod">Head of Department</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="department" required>
+                        <option value="">Select Department</option>
+                        <option value="cse">Computer Science (CSE)</option>
+                        <option value="ece">Electronics (ECE)</option>
+                        <option value="mech">Mechanical</option>
+                        <option value="civil">Civil</option>
+                        <option value="it">Information Tech (IT)</option>
+                        <option value="aiml">AI & ML</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile">
+                </div>
+
+                <div class="form-group">
+                    <label>Office Number (Optional)</label>
+                    <input type="text" id="office-number" placeholder="e.g. A-302">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Email Address</label>
+                    <input type="email" id="email" required placeholder="faculty@college.edu">
+                </div>
+
+                <!-- Password -->
+                <div class="form-group password-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                    <button type="button" class="toggle-password" onclick="togglePass('password')">
+                        <i class="far fa-eye"></i>
+                    </button>
+                    <div class="strength-meter">
+                        <div class="strength-bar" id="strength-bar"></div>
+                    </div>
+                    <div class="error-msg" id="pass-error">Weak password</div>
+                </div>
+
+                <div class="form-group password-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirm-password" required>
+                </div>
+
+                <!-- Terms -->
+                <div class="form-group full-width">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">I agree to the Terms of Service and Privacy Policy</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit full-width">Register Faculty Account</button>
+            </div>
+            <p style="text-align: center; margin-top: 1rem; color: #666;">
+                Already registered? <a href="login.html" style="color: var(--primary-color);">Login here</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="role-signup-script.js"></script>
+    <script>
+        window.CURRENT_ROLE = 'faculty';
+    </script>
+</body>
+
+</html>

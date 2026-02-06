@@ -129,9 +129,135 @@ const me = async (req, res) => {
   }
 };
 
+// Public registration endpoints
+const registerStudent = async (req, res) => {
+  try {
+    const { name, email, password, rollNumber, department, semester, phone } = req.body;
+
+    if (!name || !email || !password || !rollNumber || !department || !semester || !phone) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const createdUser = await User.create({
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password: passwordHash,
+      role: "student",
+      rollNumber,
+      department,
+      semester,
+      phone
+    });
+
+    await logAudit({
+      userId: createdUser._id,
+      role: "student",
+      action: "SELF_REGISTER",
+      ip: req.ip,
+      metadata: { role: "student" }
+    });
+
+    return res.status(201).json({ message: "Registration successful", user: sanitizeUser(createdUser) });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const registerFaculty = async (req, res) => {
+  try {
+    const { name, email, password, employeeId, designation, department, phone, officeNumber } = req.body;
+
+    if (!name || !email || !password || !employeeId || !designation || !department || !phone) {
+      return res.status(400).json({ message: "All required fields must be provided" });
+    }
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const createdUser = await User.create({
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password: passwordHash,
+      role: "faculty",
+      employeeId,
+      designation,
+      department,
+      phone,
+      officeNumber: officeNumber || ""
+    });
+
+    await logAudit({
+      userId: createdUser._id,
+      role: "faculty",
+      action: "SELF_REGISTER",
+      ip: req.ip,
+      metadata: { role: "faculty" }
+    });
+
+    return res.status(201).json({ message: "Registration successful", user: sanitizeUser(createdUser) });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const registerAdmin = async (req, res) => {
+  try {
+    const { name, email, password, employeeId, adminLevel, department, phone, officeLocation } = req.body;
+
+    if (!name || !email || !password || !employeeId || !adminLevel || !department || !phone || !officeLocation) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const createdUser = await User.create({
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password: passwordHash,
+      role: "admin",
+      employeeId,
+      adminLevel,
+      department,
+      phone,
+      officeLocation
+    });
+
+    await logAudit({
+      userId: createdUser._id,
+      role: "admin",
+      action: "SELF_REGISTER",
+      ip: req.ip,
+      metadata: { role: "admin", adminLevel }
+    });
+
+    return res.status(201).json({ message: "Registration successful", user: sanitizeUser(createdUser) });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
-  me
+  me,
+  registerStudent,
+  registerFaculty,
+  registerAdmin
 };
