@@ -99,13 +99,20 @@ async function checkSession() {
         if (res.ok) {
             const data = await res.json();
             currentUser = data.user;
+
+            // Redirect students to dedicated dashboard
+            if (currentUser.role === 'student' && !window.location.pathname.includes('student-dashboard.html')) {
+                window.location.href = 'student-dashboard.html';
+                return;
+            }
+
             updateUI(currentUser);
         } else {
             // Redirect to login page if no session
             window.location.href = 'login.html';
         }
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
+        console.error(error);
         window.location.href = 'login.html';
     }
 }

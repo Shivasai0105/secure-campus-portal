@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Secure Campus Portal</title>
+    <link href="./dist/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e5a7d;
+            --sidebar-bg: #f8f9fa;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .user-id {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: white;
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+        }
+
+        .logout-item {
+            color: #dc3545;
+            margin-top: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: #f5f7fa;
+        }
+
+        .top-bar {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-bar h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .top-bar p {
+            margin: 0.5rem 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .card-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .status-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .status-item {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .notice-item {
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+            background: #f8f9fa;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .notice-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .notice-date {
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="user-name" id="student-name">Student User</div>
+                <div class="user-id" id="student-id">2024001</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a class="menu-item active" data-section="home">
+                    <i class="fas fa-home"></i> Student Home
+                </a>
+                <a class="menu-item" data-section="bonafide">
+                    <i class="fas fa-file-alt"></i> Request Bonafide
+                </a>
+                <a class="menu-item" data-section="complaint">
+                    <i class="fas fa-exclamation-circle"></i> Request Complaint
+                </a>
+                <a class="menu-item" data-section="status">
+                    <i class="fas fa-chart-bar"></i> My Request Status
+                </a>
+                <a class="menu-item" data-section="receipts">
+                    <i class="fas fa-download"></i> Download Receipts
+                </a>
+                <a class="menu-item" data-section="notices">
+                    <i class="fas fa-bell"></i> Notice & Circular
+                </a>
+                <a class="menu-item logout-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1>🎓 Campus Portal</h1>
+                <p>Student Dashboard</p>
+            </div>
+
+            <div class="content-area">
+                <!-- Home Section -->
+                <div id="home-section" class="section active">
+                    <h2 class="section-title">Welcome to Your Dashboard</h2>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-icon">📝</div>
+                            <h3>My Complaints</h3>
+                            <p>Track all your complaints and requests</p>
+                            <button class="card-btn" onclick="showSection('complaint')">View</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-icon">📜</div>
+                            <h3>Request Bonafide</h3>
+                            <p>Request official bonafide letters for exams, scholarships, banks etc.</p>
+                            <button class="card-btn" onclick="showSection('bonafide')">Request</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-icon">📊</div>
+                            <h3>Request Status</h3>
+                            <p>Check the status of your requests</p>
+                            <button class="card-btn" onclick="showSection('status')">Check Status</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-icon">📥</div>
+                            <h3>Receipts</h3>
+                            <p>Download your payment receipts</p>
+                            <button class="card-btn" onclick="showSection('receipts')">Download</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-icon">📢</div>
+                            <h3>Notices</h3>
+                            <p>View latest notices and circulars</p>
+                            <button class="card-btn" onclick="showSection('notices')">View</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Bonafide Section -->
+                <div id="bonafide-section" class="section">
+                    <h2 class="section-title">Request Bonafide Certificate</h2>
+                    <form id="bonafide-form">
+                        <div class="form-group">
+                            <label>Purpose of Request *</label>
+                            <textarea id="bonafide-purpose" rows="4"
+                                placeholder="Enter the purpose (e.g., Bank loan, Scholarship, Exam registration)"
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="card-btn">Submit Request</button>
+                    </form>
+                </div>
+
+                <!-- Request Complaint Section -->
+                <div id="complaint-section" class="section">
+                    <h2 class="section-title">Submit a Complaint</h2>
+                    <form id="complaint-form">
+                        <div class="form-group">
+                            <label>Complaint Type *</label>
+                            <select id="complaint-type" required>
+                                <option value="">Select Type</option>
+                                <option value="academic">Academic Issue</option>
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="hostel">Hostel Related</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Description *</label>
+                            <textarea id="complaint-desc" rows="5" placeholder="Describe your complaint in detail"
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="card-btn">Submit Complaint</button>
+                    </form>
+                </div>
+
+                <!-- Request Status Section -->
+                <div id="status-section" class="section">
+                    <h2 class="section-title">My Request Status</h2>
+                    <ul class="status-list" id="status-list">
+                        <li class="status-item">
+                            <div>
+                                <strong>Bonafide Request</strong>
+                                <p style="margin: 0.25rem 0 0; color: #666; font-size: 0.9rem;">For bank loan
+                                    application</p>
+                            </div>
+                            <span class="status-badge status-pending">Pending</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Download Receipts Section -->
+                <div id="receipts-section" class="section">
+                    <h2 class="section-title">Fee Receipts</h2>
+                    <ul class="status-list" id="receipts-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Notices Section -->
+                <div id="notices-section" class="section">
+                    <h2 class="section-title">Notices & Circulars</h2>
+                    <div id="notices-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="./src/student-dashboard.js"></script>
+</body>
+
+</html>
