@@ -1,13 +1,13 @@
 const API_URL = `http://${window.location.hostname}:5000/api`;
 
-// Password Validation Config
+// Password Validation Config - Aligned with backend requirements
 const PASSWORD_CONFIG = {
-    MIN_LENGTH: 12,
+    MIN_LENGTH: 8, // Changed from 12 to match backend
     REGEX: {
         UPPER: /[A-Z]/,
         LOWER: /[a-z]/,
         NUMBER: /[0-9]/,
-        SPECIAL: /[!@#$%^&*]/
+        SPECIAL: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/ // Match backend special chars
     }
 };
 
@@ -37,12 +37,28 @@ function checkPasswordStrength(password) {
 
 function updateStrengthMeter(password) {
     const bar = document.getElementById('strength-bar');
+    const errorMsg = document.getElementById('pass-error');
     const score = checkPasswordStrength(password);
-    const colors = ['#e53935', '#e53935', '#ffca28', '#43a047', '#43a047', '#1b5e20'];
+
+    // Color scheme: red (weak) -> yellow (medium) -> green (strong)
+    const colors = ['#e53935', '#ff6f00', '#ffca28', '#66bb6a', '#43a047', '#2e7d32'];
     const widths = ['0%', '20%', '40%', '60%', '80%', '100%'];
+    const messages = [
+        'Too weak',
+        'Very weak - add more character types',
+        'Weak - needs improvement',
+        'Fair - add special characters',
+        'Good - meets requirements',
+        'Excellent - very secure!'
+    ];
 
     bar.style.width = widths[score];
     bar.style.backgroundColor = colors[score];
+
+    if (errorMsg) {
+        errorMsg.textContent = messages[score];
+        errorMsg.style.color = score >= 4 ? '#43a047' : '#e53935';
+    }
 }
 
 async function registerUser(role, data) {
@@ -78,9 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (passwordInput) {
         passwordInput.addEventListener('input', (e) => {
             updateStrengthMeter(e.target.value);
-            // Basic validation check
+            // Validation check - require at least 4/5 score
             const score = checkPasswordStrength(e.target.value);
-            if (score < 5) {
+            if (score < 4) {
                 passwordInput.classList.add('invalid');
                 passwordInput.classList.remove('valid');
             } else {
@@ -100,9 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Password Strength Check
-            if (checkPasswordStrength(passwordInput.value) < 5) {
-                alert("Password does not meet security requirements.");
+            // Password Strength Check (require at least 4/5 score)
+            const passwordScore = checkPasswordStrength(passwordInput.value);
+            if (passwordScore < 4) {
+                alert("Password does not meet security requirements. Please ensure it has:\n• At least 8 characters\n• Uppercase letter\n• Lowercase letter\n• Number\n• Special character");
                 return;
             }
 

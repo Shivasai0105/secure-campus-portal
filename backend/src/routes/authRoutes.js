@@ -10,14 +10,20 @@ const {
 } = require("../controllers/authController");
 const { requireAuth } = require("../middleware/authMiddleware");
 const { requireRole } = require("../middleware/roleMiddleware");
+const {
+  validateStudentRegistration,
+  validateFacultyRegistration,
+  validateAdminRegistration,
+  validateLogin
+} = require("../validators/authValidators");
 
 const router = express.Router();
 
-// Public routes
-router.post("/register-student", registerStudent);
-router.post("/register-faculty", registerFaculty);
-router.post("/register-admin", registerAdmin);
-router.post("/login", login);
+// Public routes with validation
+router.post("/register-student", validateStudentRegistration, registerStudent);
+router.post("/register-faculty", validateFacultyRegistration, registerFaculty);
+router.post("/register-admin", validateAdminRegistration, registerAdmin);
+router.post("/login", validateLogin, login);
 
 // Protected routes
 router.post("/logout", requireAuth, logout);
