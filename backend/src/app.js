@@ -49,6 +49,10 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' })); // Limit URL-enc
 app.use(cookieParser());
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
+// Serve static files from uploads directory
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 /* ---------- SESSION ---------- */
 app.use(
   session({
@@ -82,7 +86,22 @@ app.use((req, res, next) => {
     '/api/auth/login'
   ];
 
+  // Paths that use session-based auth (exempt from CSRF for now)
+  const sessionAuthPaths = [
+    '/api/auth/logout',
+    '/api/auth/me',
+    '/api/faculty',
+    '/api/student',
+    '/api/admin'
+  ];
+
+  // Check if path matches public paths or session auth paths
   if (publicPaths.includes(req.path)) {
+    return next();
+  }
+
+  // Check if path starts with any session auth path
+  if (sessionAuthPaths.some(path => req.path.startsWith(path))) {
     return next();
   }
 

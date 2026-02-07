@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - Secure Campus Portal</title>
+    <link href="./dist/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --sidebar-bg: #f8f9fa;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: white;
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+        }
+
+        .logout-item {
+            color: #dc3545;
+            margin-top: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: #f5f7fa;
+        }
+
+        .top-bar {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-bar h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .top-bar p {
+            margin: 0.5rem 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+            margin-left: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+            margin-left: 0.5rem;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        /* Table */
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .requests-table th,
+        .requests-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .requests-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .requests-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-flagged {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .bulk-actions {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="user-name" id="faculty-name">Faculty User</div>
+                <div class="user-role">Faculty Member</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a class="menu-item active" data-section="announcements">
+                    <i class="fas fa-bullhorn"></i> Announcements
+                </a>
+                <a class="menu-item" data-section="pending-requests">
+                    <i class="fas fa-file-alt"></i> Pending Requests
+                </a>
+                <a class="menu-item" data-section="flagged-requests">
+                    <i class="fas fa-flag"></i> Flagged Requests
+                </a>
+                <a class="menu-item logout-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h1>🎓 Campus Portal</h1>
+                <p>Faculty Dashboard</p>
+            </div>
+
+            <div class="content-area">
+                <!-- Announcements Section -->
+                <div id="announcements-section" class="section active">
+                    <h2 class="section-title">Create Announcement</h2>
+                    <div id="announcement-alert"></div>
+                    <form id="announcement-form">
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" id="notice-title" required placeholder="Enter announcement title">
+                        </div>
+                        <div class="form-group">
+                            <label>Message *</label>
+                            <textarea id="notice-body" rows="6" required
+                                placeholder="Enter announcement message"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Publish Announcement</button>
+                    </form>
+                </div>
+
+                <!-- Pending Requests Section -->
+                <div id="pending-requests-section" class="section">
+                    <h2 class="section-title">Pending Bonafide Requests</h2>
+                    <div id="pending-alert"></div>
+
+                    <div class="bulk-actions">
+                        <label>
+                            <input type="checkbox" id="select-all"> Select All
+                        </label>
+                        <button class="btn-primary btn-small" id="bulk-approve-btn">Approve Selected</button>
+                        <button class="btn-danger btn-small" id="bulk-reject-btn">Reject Selected</button>
+                    </div>
+
+                    <div id="pending-requests-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Flagged Requests Section -->
+                <div id="flagged-requests-section" class="section">
+                    <h2 class="section-title">Flagged Requests</h2>
+                    <div id="flagged-alert"></div>
+                    <div id="flagged-requests-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="./src/faculty-dashboard.js"></script>
+</body>
+
+</html>

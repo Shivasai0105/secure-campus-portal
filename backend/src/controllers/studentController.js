@@ -1,4 +1,5 @@
 const FeeReceipt = require("../models/FeeReceipt");
+const Certificate = require("../models/Certificate");
 const BonafideRequest = require("../models/BonafideRequest");
 const { logAudit } = require("../utils/auditLogger");
 
@@ -123,11 +124,37 @@ const getNotices = async (req, res) => {
   }
 };
 
+const getCertificates = async (req, res) => {
+  try {
+    const certificates = await Certificate.find({
+      studentId: req.user.id,
+      status: "active"
+    })
+      .populate("issuedBy", "name")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    await logAudit({
+      userId: req.user.id,
+      role: req.user.role,
+      action: "CERTIFICATE_VIEW",
+      ip: req.ip,
+      metadata: { count: certificates.length }
+    });
+
+    return res.json({ certificates });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getReceipts,
   getReceiptById,
   requestBonafide,
   getBonafideRequests,
   getBonafideRequestById,
-  getNotices
+  getNotices,
+  getCertificates
 };

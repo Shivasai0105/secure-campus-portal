@@ -1,4 +1,5 @@
-const API_URL = `http://${window.location.hostname}:5000/api`;
+const HOST = window.location.hostname || "localhost";
+const API_URL = `http://${HOST}:5000/api`;
 
 // Password Validation Config - Aligned with backend requirements
 const PASSWORD_CONFIG = {

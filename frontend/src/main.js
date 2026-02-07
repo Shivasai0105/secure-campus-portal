@@ -1,4 +1,5 @@
-const API_URL = `http://${window.location.hostname}:5000/api`;
+const HOST = window.location.hostname || "localhost";
+const API_URL = `http://${HOST}:5000/api`;
 let csrfToken = null;
 let currentUser = null;
 
@@ -212,6 +213,13 @@ window.reviewBonafide = async (id, action) => {
 };
 
 async function loadAdminData() {
+    // Load pending requests
+    await loadAdminPendingRequests();
+
+    // Load flagged requests
+    await loadAdminFlaggedRequests();
+
+    // Load audit logs
     const res = await apiCall("/admin/audit-logs");
     if (res.ok) {
         const { logs } = await res.json();
@@ -226,6 +234,98 @@ async function loadAdminData() {
          `).join("");
     }
 }
+
+// Admin bonafide request management
+async function loadAdminPendingRequests() {
+    const res = await apiCall("/admin/bonafide-requests");
+    if (res.ok) {
+        const { requests } = await res.json();
+        const container = document.getElementById("admin-pending-requests");
+        if (requests.length === 0) {
+            container.innerHTML = "<p class='text-gray-500'>No pending requests.</p>";
+            return;
+        }
+        container.innerHTML = requests.map(req => `
+            <div class="border p-4 rounded bg-gray-50">
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" class="admin-request-checkbox mt-1" data-id="${req._id}">
+                    <div class="flex-1">
+                        <p class="font-semibold">${req.studentId.name} (${req.studentId.email})</p>
+                        <p class="text-gray-700 italic">"${req.reason}"</p>
+                        <p class="text-xs text-gray-500 mt-1">${new Date(req.createdAt).toLocaleDateString()}</p>
+                        <div class="mt-2 space-x-2">
+                            <button onclick="adminReviewRequest('${req._id}', 'approve')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Approve</button>
+                            <button onclick="adminReviewRequest('${req._id}', 'reject')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Reject</button>
+                            <button onclick="adminFlagRequest('${req._id}')" class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">Flag</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join("");
+    }
+}
+
+async function loadAdminFlaggedRequests() {
+    const res = await apiCall("/admin/bonafide-requests/flagged");
+    if (res.ok) {
+        const { requests } = await res.json();
+        const container = document.getElementById("admin-flagged-requests");
+        if (requests.length === 0) {
+            container.innerHTML = "<p class='text-gray-500'>No flagged requests.</p>";
+            return;
+        }
+        container.innerHTML = requests.map(req => `
+            <div class="border-l-4 border-yellow-500 p-4 rounded bg-yellow-50">
+                <p class="font-semibold">${req.studentId.name} (${req.studentId.email})</p>
+                <p class="text-gray-700 italic">"${req.reason}"</p>
+                <p class="text-sm text-yellow-800 mt-1">Flag reason: ${req.flaggedReason || 'N/A'}</p>
+                <p class="text-xs text-gray-500">Status: ${req.status}</p>
+                <div class="mt-2 space-x-2">
+                    ${req.status === 'pending' ? `
+                        <button onclick="adminReviewRequest('${req._id}', 'approve')" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Approve</button>
+                        <button onclick="adminReviewRequest('${req._id}', 'reject')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Reject</button>
+                    ` : ''}
+                    <button onclick="adminUnflagRequest('${req._id}')" class="bg-gray-500 text-white px-3 py-1 rounded text-sm">Unflag</button>
+                </div>
+            </div>
+        `).join("");
+    }
+}
+
+window.adminReviewRequest = async (id, action) => {
+    if (!confirm(`Are you sure you want to ${action} this request?`)) return;
+    const res = await apiCall(`/admin/bonafide-requests/${id}/review`, "POST", { action });
+    if (res.ok) {
+        alert(`Request ${action}ed successfully`);
+        await loadAdminPendingRequests();
+        await loadAdminFlaggedRequests();
+    } else {
+        alert("Failed to review request");
+    }
+};
+
+window.adminFlagRequest = async (id) => {
+    const reason = prompt("Enter reason for flagging:");
+    if (!reason) return;
+    const res = await apiCall(`/admin/bonafide-requests/${id}/flag`, "POST", { reason });
+    if (res.ok) {
+        alert("Request flagged successfully");
+        await loadAdminPendingRequests();
+        await loadAdminFlaggedRequests();
+    } else {
+        alert("Failed to flag request");
+    }
+};
+
+window.adminUnflagRequest = async (id) => {
+    const res = await apiCall(`/admin/bonafide-requests/${id}/flag`, "POST", {});
+    if (res.ok) {
+        alert("Request unflagged successfully");
+        await loadAdminFlaggedRequests();
+    } else {
+        alert("Failed to unflag request");
+    }
+};
 
 // Student forms
 document.getElementById("bonafide-form")?.addEventListener("submit", async (e) => {
@@ -286,6 +386,133 @@ document.getElementById("faculty-create-notice-form")?.addEventListener("submit"
     if (res.ok) {
         alert("Announcement posted successfully!");
         document.getElementById("faculty-create-notice-form").reset();
+    } else {
+        const data = await res.json();
+        alert("Error: " + data.message);
+    }
+});
+
+// Admin bulk actions
+document.getElementById("admin-select-all")?.addEventListener("click", () => {
+    const checkboxes = document.querySelectorAll(".admin-request-checkbox");
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+});
+
+document.getElementById("admin-bulk-approve")?.addEventListener("click", async () => {
+    const checkboxes = document.querySelectorAll(".admin-request-checkbox:checked");
+    const requestIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+
+    if (requestIds.length === 0) {
+        alert("Please select at least one request");
+        return;
+    }
+
+    if (!confirm(`Approve ${requestIds.length} request(s)?`)) return;
+
+    const res = await apiCall("/admin/bonafide-requests/bulk-review", "POST", { requestIds, action: "approve" });
+    if (res.ok) {
+        alert("Requests approved successfully");
+        await loadAdminPendingRequests();
+    } else {
+        alert("Failed to approve requests");
+    }
+});
+
+document.getElementById("admin-bulk-reject")?.addEventListener("click", async () => {
+    const checkboxes = document.querySelectorAll(".admin-request-checkbox:checked");
+    const requestIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+
+    if (requestIds.length === 0) {
+        alert("Please select at least one request");
+        return;
+    }
+
+    if (!confirm(`Reject ${requestIds.length} request(s)?`)) return;
+
+    const res = await apiCall("/admin/bonafide-requests/bulk-review", "POST", { requestIds, action: "reject" });
+    if (res.ok) {
+        alert("Requests rejected successfully");
+        await loadAdminPendingRequests();
+    } else {
+        alert("Failed to reject requests");
+    }
+});
+
+// Admin certificate upload
+document.getElementById("upload-certificate-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("studentId", document.getElementById("cert-student-id").value);
+    formData.append("type", document.getElementById("cert-type").value);
+    formData.append("certificateNumber", document.getElementById("cert-number").value);
+    formData.append("certificate", document.getElementById("cert-file").files[0]);
+
+    const res = await fetch(`${API_URL}/admin/certificates/upload`, {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+    });
+
+    if (res.ok) {
+        alert("Certificate uploaded successfully!");
+        e.target.reset();
+    } else {
+        const data = await res.json();
+        alert("Error: " + data.message);
+    }
+});
+
+// Admin certificate generation (NEW - Dynamic PDF)
+document.getElementById("generate-certificate-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+        studentId: document.getElementById("gen-cert-student-id").value,
+        type: document.getElementById("gen-cert-type").value,
+        certificateNumber: document.getElementById("gen-cert-number").value,
+        course: document.getElementById("gen-cert-course").value,
+        academicYear: document.getElementById("gen-cert-year").value,
+        purpose: document.getElementById("gen-cert-purpose").value
+    };
+
+    const res = await apiCall("/admin/certificates/generate", "POST", data);
+
+    if (res.ok) {
+        const result = await res.json();
+        alert("✅ Certificate generated successfully! Students can now download it.");
+        e.target.reset();
+    } else {
+        const error = await res.json();
+        alert("Error: " + error.message);
+    }
+});
+
+// Admin receipt upload
+document.getElementById("upload-receipt-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("studentId", document.getElementById("receipt-student-id").value);
+    formData.append("receiptNumber", document.getElementById("receipt-number").value);
+    formData.append("academicYear", document.getElementById("receipt-academic-year").value);
+    formData.append("semester", document.getElementById("receipt-semester").value);
+    formData.append("amount", document.getElementById("receipt-amount").value);
+    formData.append("paymentDate", document.getElementById("receipt-date").value);
+    formData.append("paymentMode", "online");
+    formData.append("feeType", document.getElementById("receipt-type").value);
+    formData.append("receipt", document.getElementById("receipt-file").files[0]);
+
+    const res = await fetch(`${API_URL}/admin/receipts/upload`, {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+    });
+
+    if (res.ok) {
+        alert("Receipt uploaded successfully!");
+        e.target.reset();
     } else {
         const data = await res.json();
         alert("Error: " + data.message);

@@ -1,4 +1,5 @@
-const API_URL = `http://${window.location.hostname}:5000/api`;
+const HOST = window.location.hostname || "localhost";
+const API_URL = `http://${HOST}:5000/api`;
 let currentUser = null;
 let csrfToken = null;
 
@@ -106,6 +107,7 @@ async function loadDashboardData() {
     await Promise.all([
         loadNotices(),
         loadReceipts(),
+        loadCertificates(),
         loadBonafideHistory()
     ]);
 }
@@ -148,16 +150,44 @@ async function loadReceipts() {
                 container.innerHTML = receipts.map(r => `
                     <li class="status-item">
                         <div>
-                            <strong>Receipt #${r._id.substr(-6)}</strong>
-                            <p style="margin: 0.25rem 0 0; color: #666; font-size: 0.9rem;">Amount: ₹${r.amount}</p>
+                            <strong>Receipt #${r.receiptNumber || r._id.substr(-6)}</strong>
+                            <p style="margin: 0.25rem 0 0; color: #666; font-size: 0.9rem;">Amount: ₹${r.amount} | ${r.semester} - ${r.academicYear || ''}</p>
                         </div>
-                        <button class="card-btn" style="padding: 0.5rem 1rem;">Download</button>
+                        ${r.fileUrl ? `<a href="http://${HOST}:5000${r.fileUrl}" target="_blank" class="card-btn" style="padding: 0.5rem 1rem; text-decoration: none;">Download PDF</a>` : '<span style="color: #999;">No file</span>'}
                     </li>
                 `).join('');
             }
         }
     } catch (error) {
         console.error('Error loading receipts:', error);
+    }
+}
+
+async function loadCertificates() {
+    try {
+        const res = await fetch(`${API_URL}/student/certificates`, { credentials: 'include' });
+        if (res.ok) {
+            const { certificates } = await res.json();
+            const container = document.getElementById('certificates-list');
+
+            if (!container) return; // If element doesn't exist yet, skip
+
+            if (certificates.length === 0) {
+                container.innerHTML = '<li style="color: #666; list-style: none;">No certificates found.</li>';
+            } else {
+                container.innerHTML = certificates.map(cert => `
+                    <li class="status-item">
+                        <div>
+                            <strong>${cert.type.replace('_', ' ').toUpperCase()} Certificate</strong>
+                            <p style="margin: 0.25rem 0 0; color: #666; font-size: 0.9rem;">Cert #${cert.certificateNumber} | Issued: ${new Date(cert.issueDate).toLocaleDateString()}</p>
+                        </div>
+                        ${cert.fileUrl ? `<a href="http://${HOST}:5000${cert.fileUrl}" target="_blank" class="card-btn" style="padding: 0.5rem 1rem; text-decoration: none;">Download PDF</a>` : '<span style="color: #999;">No file</span>'}
+                    </li>
+                `).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading certificates:', error);
     }
 }
 

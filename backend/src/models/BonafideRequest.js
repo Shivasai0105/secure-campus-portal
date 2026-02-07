@@ -14,6 +14,15 @@ const bonafideRequestSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500
     },
+    certificateType: {
+      type: String,
+      enum: ["bonafide", "character", "transfer", "course_completion"],
+      default: "bonafide"
+    },
+    certificateId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Certificate"
+    },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
@@ -28,6 +37,16 @@ const bonafideRequestSchema = new mongoose.Schema(
       type: Date
     },
     remarks: {
+      type: String,
+      trim: true,
+      maxlength: 500
+    },
+    isFlagged: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+    flaggedReason: {
       type: String,
       trim: true,
       maxlength: 500
